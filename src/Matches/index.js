@@ -41,12 +41,6 @@ const Match = props => (
     <List.Content>
       Score: { props.score }
     </List.Content>
-    <List.Content>
-      Date: { props.date }
-    </List.Content>
-    <List.Content>
-      Sentiment: { props.sentiment }
-    </List.Content>
   </List.Item>
 );
 
@@ -54,9 +48,7 @@ const Match = props => (
 Match.propTypes = {
   title: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
   score: PropTypes.string.isRequired,
-  sentiment: PropTypes.object.isRequired
 };
 
 const Matches = props => (
@@ -68,11 +60,9 @@ const Matches = props => (
             <Match
               key={ item.id }
               title={ getTitle(item) }
-              text={ getText(item) }
+              text={ getText(item).replace(getTitle(item),"") }
               highlightText={ item.highlightText }
               score={ getScore(item) }
-              date={ item.date }
-              sentiment={ getSentiment(item) }
             />)
           }
         </List>

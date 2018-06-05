@@ -97,7 +97,7 @@ class Main extends React.Component {
       queryType: queryType || utils.QUERY_NATURAL_LANGUAGE,
       returnPassages: returnPassages || false,
       limitResults: limitResults || false,
-      sortOrder: sortOrder || utils.sortKeys[0].sortBy,
+      //sortOrder: sortOrder || utils.sortKeys[0].sortBy,
       // used by filters
       selectedEntities: selectedEntities || new Set(),
       selectedCategories: selectedCategories || new Set(),
@@ -365,7 +365,7 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: trendQuery,
       filters: this.buildFilterStringForQuery(),
-      count: (limitResults == true ? 100 : 1000)
+      count: (limitResults == true ? 100 : 5000)
     });
 
     // send request
@@ -419,7 +419,7 @@ class Main extends React.Component {
       limitResults,
       sortOrder
     } = this.state;
-
+	  
     // clear filters if this a new text search
     if (clearFilters) {
       selectedEntities.clear();
@@ -448,7 +448,7 @@ class Main extends React.Component {
     const qs = queryString.stringify({
       query: searchQuery,
       filters: filterString,
-      count: (limitResults == true ? 100 : 1000),
+      count: (limitResults == true ? 100 : 5000),
       sort: sortOrder,
       returnPassages: returnPassages,
       queryType: (queryType === utils.QUERY_NATURAL_LANGUAGE ? 
@@ -456,6 +456,7 @@ class Main extends React.Component {
     });
 
     // send request
+    console.log(qs);
     fetch(`/api/search?${qs}`)
       .then(response => {
         if (response.ok) {
@@ -466,8 +467,8 @@ class Main extends React.Component {
       })
       .then(json => {
         var data = utils.parseData(json);
+		console.log(data);
         var passages = [];
-
         if (returnPassages) {
           passages = parsePassages(json);
           // console.log('+++ PASSAGES RESULTS +++');
@@ -476,7 +477,6 @@ class Main extends React.Component {
         }
 
         data = utils.formatData(data, passages, filterString);
-        
         console.log('+++ DISCO RESULTS +++');
         // const util = require('util');
         // console.log(util.inspect(data.results, false, null));
@@ -747,10 +747,8 @@ class Main extends React.Component {
     const { activeFilterIndex } = this.state;
 
     const stat_items = [
-      { key: 'matches', label: 'REVIEWS', value: numMatches },
-      { key: 'positive', label: 'POSITIVE', value: numPositive },
-      { key: 'neutral', label: 'NEUTRAL', value: numNeutral },
-      { key: 'negative', label: 'NEGATIVE', value: numNegative }
+      { key: 'matches', label: 'Results', value: numMatches }
+
     ];
 
     var filtersOn = false;
@@ -888,7 +886,7 @@ class Main extends React.Component {
 
           {/* Results */}
 
-          <Grid.Column width={7}>
+          <Grid.Column width={12}>
             <Grid.Row>
               {loading ? (
                 <div className="results">
@@ -913,15 +911,6 @@ class Main extends React.Component {
                           size='mini'
                           items={ stat_items }
                         />
-                        <Menu compact className="sort-dropdown">
-                          <Icon name='sort' size='large' bordered inverted />
-                          <Dropdown 
-                            item
-                            onChange={ this.sortOrderChange.bind(this) }
-                            value={ sortOrder }
-                            options={ utils.sortTypes }
-                          />
-                        </Menu>
                       </div>
                       <div>
                         {this.getMatches()}
@@ -948,46 +937,6 @@ class Main extends React.Component {
             </Grid.Row>
           </Grid.Column>
 
-          <Grid.Column width={6}>
-
-            {/* Sentiment Chart Region */}
-
-            <Grid.Row className='rrr'>
-              <SentimentChart
-                entities={entities}
-                categories={categories}
-                concepts={concepts}
-                keywords={keywords}
-                entityTypes={entityTypes}
-                term={sentimentTerm}
-                onSentimentTermChanged={this.sentimentTermChanged.bind(this)}
-              />
-            </Grid.Row>
-
-            <Divider hidden/>
-            <Divider/>
-            <Divider hidden/>
-
-            {/* Trend Chart Region */}
-
-            <Grid.Row className='ttt'>
-              <div className="trend-chart">
-                <TrendChart
-                  trendData={trendData}
-                  trendLoading={trendLoading}
-                  trendError={trendError}
-                  entities={entities}
-                  categories={categories}
-                  concepts={concepts}
-                  keywords={keywords}
-                  entityTypes={entityTypes}
-                  term={trendTerm}
-                  onGetTrendDataRequest={this.getTrendData.bind(this)}
-                />
-              </div>
-            </Grid.Row>
-
-          </Grid.Column>
         </Grid.Row>
       </Grid>
     );
